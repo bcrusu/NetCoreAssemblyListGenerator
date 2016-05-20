@@ -7,15 +7,15 @@ namespace gen.Internal
 {
     public class ApplicationEngine : IApplicationEngine
     {
-        private const string DefaultAssemblyListWriter = "dotPeek";
-        private const string DefaultOutFileName = "assemblyList";
+        private const string DefaultAssemblyListWriter = "plaintext";
+        private const string DefaultOutFileName = "assemblyList_";
         private const string DefaultTfm = "netstandard1.5";
 
         private readonly IAssemblyFinder _assemblyFinder;
         private readonly IAssemblyFilter _assemblyFilter;
         private readonly IAssemblyListWriterFactory _assemblyListWriterFactory;
 
-        public ApplicationEngine(IAssemblyFinder assemblyFinder, 
+        public ApplicationEngine(IAssemblyFinder assemblyFinder,
             IAssemblyFilter assemblyFilter,
             IAssemblyListWriterFactory assemblyListWriterFactory)
         {
@@ -56,10 +56,8 @@ namespace gen.Internal
             // render and write to disk
             var listContents = assemblyListWriter.Write(assemblyPaths);
 
-            var outputFileName = DefaultOutFileName + assemblyListWriter.GetFileExtension();
-            var outputPath = Path.Combine(outDirectory, outputFileName);
-
-            File.WriteAllText(outputPath, listContents);
+            var outputFileName = GetOutputFileName(outDirectory, assemblyListWriter.GetFileExtension());
+            File.WriteAllText(outputFileName, listContents);
         }
 
         private static string GetUserHomePath()
@@ -86,6 +84,13 @@ namespace gen.Internal
                 return Environment.GetEnvironmentVariable("HOME");
 
             return null;
+        }
+
+        private static string GetOutputFileName(string outDirectory, string fileExtension)
+        {
+            var result = DefaultOutFileName + DateTime.Now.Ticks + fileExtension;
+            result = Path.Combine(outDirectory, result);
+            return result;
         }
     }
 }
