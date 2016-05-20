@@ -17,14 +17,15 @@ namespace gen
         {
             string inDirectory;
             string outDirectory;
+            string targetFramework;
             string format;
-            if (!TryGetOptionValues(out inDirectory, out outDirectory, out format))
+            if (!TryGetOptionValues(out inDirectory, out outDirectory, out targetFramework, out format))
                 return -1;
 
             try
             {
                 var applicationEngine = ServiceLocator.CreateApplicationEngine();
-                applicationEngine.Run(inDirectory, outDirectory, format);
+                applicationEngine.Run(inDirectory, outDirectory, targetFramework, format);
             }
             catch (Exception e)
             {
@@ -35,10 +36,11 @@ namespace gen
             return 0;
         }
 
-        private static bool TryGetOptionValues(out string inDirectory, out string outDirectory, out string format)
+        private static bool TryGetOptionValues(out string inDirectory, out string outDirectory, out string targetFramework, out string format)
         {
             inDirectory = null;
             outDirectory = null;
+            targetFramework = null;
             format = null;
 
             foreach (var option in Application.Options)
@@ -68,6 +70,9 @@ namespace gen
                     case "format":
                         format = optionValue;
                         break;
+                    case "targetFramework":
+                        targetFramework = optionValue;
+                        break;
                 }
             }
 
@@ -86,6 +91,11 @@ namespace gen
             result.Options.Add(new CommandOption("--out|-o <path>", CommandOptionType.SingleValue)
             {
                 Description = "Output directory. Defaults to the current directory."
+            });
+
+            result.Options.Add(new CommandOption("--targetFramework|-tfm <tfm>", CommandOptionType.SingleValue)
+            {
+                Description = "'Target Framework Moniker' (TFM) used to filter compatible assembiles."
             });
 
             result.Options.Add(new CommandOption("--format|-f <name>", CommandOptionType.SingleValue)

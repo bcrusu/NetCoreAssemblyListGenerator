@@ -9,7 +9,7 @@ namespace gen.Internal
         private static readonly IDictionary<string, IAssemblyListWriter> Registry = new Dictionary<string, IAssemblyListWriter>(StringComparer.OrdinalIgnoreCase)
         {
             {"ILSpy", new IlSpyAssemblyListWriter()},
-            {"dotPeek", new IlSpyAssemblyListWriter()}
+            {"dotPeek", new DotPeekAssemblyListWriter()}
         };
 
         public IAssemblyListWriter Create(string name)

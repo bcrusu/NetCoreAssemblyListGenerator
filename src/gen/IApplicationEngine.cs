@@ -2,6 +2,6 @@
 {
     public interface IApplicationEngine
     {
-        void Run(string inDirectory, string outDirectory, string listFormat);
+        void Run(string inDirectory, string outDirectory, string targetFramework, string listFormat);
     }
 }

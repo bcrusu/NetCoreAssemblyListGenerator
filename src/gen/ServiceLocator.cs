@@ -18,6 +18,7 @@ namespace gen
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IApplicationEngine, ApplicationEngine>();
             serviceCollection.AddSingleton<IAssemblyFinder, AssemblyFinder>();
+            serviceCollection.AddSingleton<IAssemblyFilter, AssemblyFilter>();
             serviceCollection.AddSingleton<IAssemblyListWriterFactory, AssemblyListWriterFactory>();
 
             return serviceCollection.BuildServiceProvider();
