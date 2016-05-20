@@ -7,7 +7,7 @@ namespace gen.Internal
 {
     public class ApplicationEngine : IApplicationEngine
     {
-        private const string DefaultAssemblyListWriter = "plaintext";
+        private const string DefaultAssemblyListWriter = "dotPeek";
         private const string DefaultOutFileName = "assemblyList_";
         private const string DefaultTfm = "netstandard1.5";
 

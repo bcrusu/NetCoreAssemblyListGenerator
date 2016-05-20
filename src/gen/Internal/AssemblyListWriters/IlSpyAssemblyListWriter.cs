@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace gen.Internal.AssemblyListWriters
@@ -13,7 +14,9 @@ namespace gen.Internal.AssemblyListWriters
         public string Write(IEnumerable<string> assemblyPaths)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("<List name=\"Generated\">");
+            sb.Append("<List name=\"Generated_");
+            sb.Append(DateTime.Now.Ticks);
+            sb.AppendLine("\">");
 
             foreach (var assemblyPath in assemblyPaths)
             {

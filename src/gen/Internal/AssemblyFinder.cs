@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace gen.Internal
 {
@@ -23,7 +24,8 @@ namespace gen.Internal
             var result = new List<string>();
 
             var assemblyPaths = Directory.GetFiles(directory)
-                .Where(MatchAssemblyExtension);
+                .Where(MatchAssemblyExtension)
+                .Where(IsNotReferenceAssemblyPath);
 
             result.AddRange(assemblyPaths);
 
@@ -40,6 +42,24 @@ namespace gen.Internal
 
             var extension = Path.GetExtension(filePath);
             return KnownAssemblyExtensions.Contains(extension);
+        }
+
+        private static bool IsNotReferenceAssemblyPath(string filePath)
+        {
+            var tmp = Path.GetDirectoryName(filePath);
+            if (tmp != null)
+            {
+                tmp = Path.GetDirectoryName(tmp);
+                if (tmp != null)
+                {
+                    tmp = Path.GetFileName(tmp);
+                    if (tmp != null)
+                        return !string.Equals(tmp, "ref", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+
+            // if path does not point to a nuget package directory
+            return true;
         }
     }
 }
