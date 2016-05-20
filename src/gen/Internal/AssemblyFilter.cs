@@ -13,6 +13,8 @@ namespace gen.Internal
             if (!TryParseTargetFramework(targetFrameworkStr, out targetFramework))
                 throw new ArgumentException("Invalid target framework value.");
 
+            var compatibilityProvider = new CompatibilityProvider(new DefaultFrameworkNameProvider());
+
             var result = new LinkedList<string>();
             foreach (var assemblyPath in assemblyPaths)
             {
@@ -20,13 +22,16 @@ namespace gen.Internal
                 if (!TryGetTargetFrameworkFromPath(assemblyPath, out framework))
                     continue;
 
-                bool isCompatible;
-                if (framework.Equals(targetFramework))
-                    isCompatible = true;
-                else
+                var isCompatible = compatibilityProvider.IsCompatible(targetFramework, framework);
+                if (!isCompatible)
                 {
-                    var compatibleFrameworks = ExpandTargetFramework(framework);
-                    isCompatible = compatibleFrameworks.Contains(targetFramework);
+                    var expandedFrameworks = ExpandTargetFramework(framework);
+                    foreach (var expandedFramework in expandedFrameworks)
+                    {
+                        isCompatible = compatibilityProvider.IsCompatible(targetFramework, expandedFramework);
+                        if (isCompatible)
+                            break;
+                    }
                 }
 
                 if (isCompatible)
