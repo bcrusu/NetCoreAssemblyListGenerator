@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace gen.Internal
 {
@@ -25,7 +24,9 @@ namespace gen.Internal
 
             var assemblyPaths = Directory.GetFiles(directory)
                 .Where(MatchAssemblyExtension)
-                .Where(IsNotReferenceAssemblyPath);
+                .Where(NotInNativeDirectory)
+                .Where(NotInRuntimesDirectory)
+                .Where(InLibDirectory);
 
             result.AddRange(assemblyPaths);
 
@@ -44,22 +45,36 @@ namespace gen.Internal
             return KnownAssemblyExtensions.Contains(extension);
         }
 
-        private static bool IsNotReferenceAssemblyPath(string filePath)
+        private static bool InLibDirectory(string filePath)
         {
-            var tmp = Path.GetDirectoryName(filePath);
-            if (tmp != null)
+            var tmp = GetParentDir(filePath, 2);
+            return string.Equals(tmp, "lib", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool NotInNativeDirectory(string filePath)
+        {
+            var tmp = GetParentDir(filePath, 1);
+            return !string.Equals(tmp, "native", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool NotInRuntimesDirectory(string filePath)
+        {
+            var tmp = GetParentDir(filePath, 4);
+            return !string.Equals(tmp, "runtimes", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string GetParentDir(string filePath, int nthParent)
+        {
+            while (nthParent > 0)
             {
-                tmp = Path.GetDirectoryName(tmp);
-                if (tmp != null)
-                {
-                    tmp = Path.GetFileName(tmp);
-                    if (tmp != null)
-                        return !string.Equals(tmp, "ref", StringComparison.OrdinalIgnoreCase);
-                }
+                filePath = Path.GetDirectoryName(filePath);
+                if (filePath == null)
+                    return null;
+
+                nthParent--;
             }
 
-            // if path does not point to a nuget package directory
-            return true;
+            return Path.GetFileName(filePath);
         }
     }
 }
